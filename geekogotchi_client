@@ -1,15 +1,20 @@
 #!/usr/bin/env python
 
+import dbus
 from geekogotchi_ui import GeekogotchiUI
 
 class GeekogotchiClient:
   ui = None
-  connection = None
+  bus = None
   def __init__(self):
     self.ui = GeekogotchiUI(self)
-  def connect(self):
+    self.ui.connect()
+  def connect(self, *args, **kargs):
     '''Connect to Geekogotchi server'''
-    return None
+    if kargs.get('mainloop'):
+        self.bus = dbus.SystemBus(mainloop = kargs['mainloop'])
+    else:
+        self.bus = dbus.SystemBus()
   def disconnect(self):
     '''Disonnect from Geekogotchi server'''
     return None
