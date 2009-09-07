@@ -1,0 +1,33 @@
+#!/usr/bin/env python
+
+from geekogotchi_ui import GeekogotchiUI
+
+class GeekogotchiClient:
+  ui = None
+  connection = None
+  def __init__(self):
+    self.ui = GeekogotchiUI(self)
+  def connect(self):
+    '''Connect to Geekogotchi server'''
+    return None
+  def disconnect(self):
+    '''Disonnect from Geekogotchi server'''
+    return None
+  def start(self):
+    '''Start UI'''
+    self.ui.start()
+  def stop(self):
+    '''Exit from UI mainloop'''
+    self.ui.exit()
+  def getCharacter(self):
+    '''Return character info'''
+    # TODO
+    return {'Name':'Alik', 'Born':1234567, 'Age': 2, 'Health':100, 'Hungry':0}
+  def destroy(self):
+    '''Shutting down client'''
+    self.ui.destroy()
+    self.ui = None
+
+client = GeekogotchiClient()
+client.start()
+client.destroy()
