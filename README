@@ -1,0 +1,12 @@
+--- Geekogotchi ---
+
+Tamagotchi-like game targetted mainly for Openmoko devices, based on FSO framework.
+
+Language: Python
+Toolkit: EFL (evas/edje/elementary), maybe also ncurses backend for NanoNote devices
+
+Geekogotchi is going to be innovative regarding integration with phone system, trying to show new abilities of using open and free phone stack.
+Coming soon, stay tuned!
+
+Sebastian Krzyszkowiak
+dos
