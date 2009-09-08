@@ -1,5 +1,18 @@
 #!/usr/bin/env python
 
-import dbus
+import dbus, dbus.service
+import gobject
+#from gobject import timeout_add_seconds
+
+def idle():
+  print 'idle'
+  return False
+
+mainloop = gobject.MainLoop()
+bus = dbus.SystemBus()
+
+gobject.idle_add(idle)
+
+mainloop.run()
 
 # TODO...
