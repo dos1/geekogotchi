@@ -3,6 +3,7 @@ import dbus, dbus.service
 import gobject
 from dbus.mainloop.glib import DBusGMainLoop
 from dbus.service import FallbackObject as DBusFBObject
+from random import randint
 import os, pickle
 import signal
 
@@ -121,9 +122,9 @@ class Pet(DBusFBObject):
 
   def born(self):
     self.props['Borned']=True
-    self.props['Happiness']=100
-    self.props['Hungriness']=100
-    self.props['Health']=100
+    self.props['Happiness']=randint(20, 40)
+    self.props['Hungriness']=randint(0, 10)
+    self.props['Health']=randint(90, 100)
     self.PetBorned()
     self.StateUpdated(self.props)
 
