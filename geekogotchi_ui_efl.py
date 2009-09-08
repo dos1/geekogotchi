@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import elementary, edje, e_dbus
+import elementary, edje, ecore, e_dbus
 
 class GeekogotchiUI_EFL:
   parent = None
@@ -15,6 +15,8 @@ class GeekogotchiUI_EFL:
     self.win.destroy = self.windowClose
   def windowClose(self, *args, **kargs):
     self.parent.stop()
+  def timer(self, interval, func):
+    return ecore.timer_add(interval, func)
   def connect(self):
     self.parent.connect(mainloop = e_dbus.DBusEcoreMainLoop())
   def start(self):
