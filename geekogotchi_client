@@ -12,6 +12,7 @@ class GeekogotchiClient:
   def connect(self, *args, **kargs):
     '''Connect to Geekogotchi server'''
     self.bus = dbus.SystemBus(mainloop = kargs['mainloop'])
+    self.proxy = dbus.Interface(self.bus.get_object('org.shr.Geekogotchi','/org/shr/Geekogotchi/Server'), dbus_interface='org.shr.Geekogotchi.Server')
   def disconnect(self):
     '''Disonnect from Geekogotchi server'''
     return None
