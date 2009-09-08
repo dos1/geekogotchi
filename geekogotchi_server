@@ -16,7 +16,7 @@ DBUS_IF_PETS='org.shr.Geekogotchi.Pets'
 
 PERSIST_DATA='/usr/share/geekogotchi/pets.pickle'
 
-UPDATE_INTERVAL = 5
+UPDATE_INTERVAL = 1
 
 VERSION = '0.0.0.0.1'
 
