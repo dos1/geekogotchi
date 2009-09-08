@@ -11,10 +11,7 @@ class GeekogotchiClient:
     self.ui.connect()
   def connect(self, *args, **kargs):
     '''Connect to Geekogotchi server'''
-    if kargs.get('mainloop'):
-        self.bus = dbus.SystemBus(mainloop = kargs['mainloop'])
-    else:
-        self.bus = dbus.SystemBus()
+    self.bus = dbus.SystemBus(mainloop = kargs['mainloop'])
   def disconnect(self):
     '''Disonnect from Geekogotchi server'''
     return None
