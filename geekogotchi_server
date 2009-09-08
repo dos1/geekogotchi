@@ -2,16 +2,38 @@
 
 import dbus, dbus.service
 import gobject
+from dbus.mainloop.glib import DBusGMainLoop
+from dbus.service import FallbackObject as DBusFBObject
 #from gobject import timeout_add_seconds
+
+DBUS_PATH_SERVER='/org/shr/Geekogotchi/Server'
+DBUS_IF_SERVER='org.shr.Geekogotchi.Server'
+VERSION = '0.0.0'
+
+class Server(DBusFBObject):
+  @dbus.service.method(DBUS_IF_SERVER, "", "s")
+  def GetVersion(self):
+    return VERSION
+
+  def __init__(self):
+    DBusFBObject.__init__( self, conn=bus, object_path=DBUS_PATH_SERVER)
 
 def idle():
   print 'idle'
   return False
 
+DBusGMainLoop(set_as_default=True)
 mainloop = gobject.MainLoop()
 bus = dbus.SystemBus()
+try:
+    busname = dbus.service.BusName( 'org.shr.Geekogotchi', bus )
+except dbus.DBusException:
+    print( "Can't claim dbus bus name, check configuration in /etc/dbus-1/system.d/geekogotchi.conf" )
+    exit(1)
 
-gobject.idle_add(idle)
+server = Server()
+
+#gobject.idle_add(idle)
 
 mainloop.run()
 
