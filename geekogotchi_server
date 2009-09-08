@@ -1,9 +1,10 @@
 #!/usr/bin/env python
-
 import dbus, dbus.service
 import gobject
 from dbus.mainloop.glib import DBusGMainLoop
 from dbus.service import FallbackObject as DBusFBObject
+import os, pickle
+import signal
 
 DBUS_PATH_SERVER='/org/shr/Geekogotchi/Server'
 DBUS_IF_SERVER='org.shr.Geekogotchi.Server'
@@ -11,6 +12,10 @@ DBUS_PATH_PETS='/org/shr/Geekogotchi/Pets'
 DBUS_PATH_PET='/org/shr/Geekogotchi/Pet'
 DBUS_IF_PET='org.shr.Geekogotchi.Pet'
 DBUS_IF_PETS='org.shr.Geekogotchi.Pets'
+
+PERSIST_DATA='/usr/share/geekogotchi/pets.pickle'
+
+UPDATE_INTERVAL = 5
 
 VERSION = '0.0.0.0.1'
 
@@ -21,8 +26,10 @@ class Server(DBusFBObject):
     self.pets = Pets()
 
   def start(self):
-    self.update()
-    gobject.timeout_add_seconds(5, self.update)
+    self.pets.start()
+
+  def stop(self):
+    self.pets.store()
 
   def update(self):
     self.pets.update()
@@ -40,16 +47,37 @@ class Pets(DBusFBObject):
     DBusFBObject.__init__( self, conn=bus, object_path=DBUS_PATH_PETS )
     self.pets = {}
     self.petcount = -1
+    if os.path.exists(PERSIST_DATA):
+      pickleFile = open(PERSIST_DATA, "r")
+      self.petcount, petprops = pickle.load(pickleFile)
+      for pet in petprops:
+        self.pets[pet]= Pet(pet, petprops[pet])
+
+  def start(self):
+    for pet in self.pets:
+      if not self.pets[pet].props['Dead']:
+        print self.pets[pet].props['Dead']
+        gobject.timeout_add_seconds(UPDATE_INTERVAL, self.pets[pet].update)
 
   def update(self):
     for pet in self.pets:
       self.pets[pet].update()
+
+  def store(self):
+    print "storing"
+    pickleFile = open(PERSIST_DATA, "w")
+    petprops = {}
+    for pet in self.pets:
+      petprops[pet] = self.pets[pet].props
+    pickle.dump((self.petcount, petprops),pickleFile)
+    pickleFile.close()
 
   @dbus.service.method(DBUS_IF_PETS, "", "i")
   def AddPet(self):
     self.petcount += 1
     self.pets[self.petcount] = Pet(self.petcount)
     self.pets[self.petcount].update()
+    gobject.timeout_add_seconds(UPDATE_INTERVAL, self.pets[self.petcount].update)
     return self.petcount
 
   @dbus.service.method(DBUS_IF_PETS, "i", "")
@@ -70,17 +98,43 @@ class Pet(DBusFBObject):
   pets = None
   props = None
 
-  def __init__(self, id):
+  def __init__(self, id, props = None):
     self.id = id
     DBusFBObject.__init__( self, conn=bus, object_path=DBUS_PATH_PET+'/'+str(self.id) )
-    self.props = {'Name': 'Tux', 'Live': True, 'Age':0, 'Deat': False, 'Borned':False}
+    if not props:
+      self.props = {'Name': 'Tux', 'Alive': True, 'Age':-1, 'Dead': False, 'Borned':False}
+    else:
+      self.props = props
+      self.update()
 
   def update(self):
     print "update " + str(self.id)
-    self.props['Age'] += 1
+    if not self.props['Borned'] and self.props['Age']==0:
+      self.born()
+    elif self.props['Alive']:
+      self.props['Age'] += 1
+      self.StateUpdated(self.props)
+      if self.props['Age']>=100:
+        self.kill('age')
+        return False
+    return True
+
+  def born(self):
+    self.props['Borned']=True
+    self.props['Happiness']=100
+    self.props['Hungriness']=100
+    self.props['Health']=100
+    self.PetBorned()
     self.StateUpdated(self.props)
 
   def kill(self, reason = 'killed'):
+    if self.props['Borned']:
+      del self.props['Happiness']
+      del self.props['Hungriness']
+      del self.props['Health']
+    self.props['Alive'] = False
+    self.props['Dead'] = True
+    self.StateUpdated(self.props)
     self.PetDeath(reason)
 
   @dbus.service.signal(DBUS_IF_PET, "a{sv}")
@@ -88,13 +142,12 @@ class Pet(DBusFBObject):
     pass
 
   @dbus.service.signal(DBUS_IF_PET, "")
+  def PetBorned(self):
+    pass
+
+  @dbus.service.signal(DBUS_IF_PET, "s")
   def PetDeath(self, cause):
-    del self.props['Happiness']
-    del self.props['Hungriness']
-    del self.props['Health']
-    self.props['Live'] = False
-    self.props['Dead'] = True
-    self.StateUpdated(self.props)
+    pass
 
   @dbus.service.method(DBUS_IF_PET, "", "s")
   def GetName(self):
@@ -111,4 +164,9 @@ except dbus.DBusException:
 
 server = Server()
 server.start()
-mainloop.run()
+signal.signal(signal.SIGTERM, server.stop)
+try:
+  mainloop.run()
+except KeyboardInterrupt:
+  server.stop()
+  mainloop.quit()
