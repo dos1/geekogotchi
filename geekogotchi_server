@@ -8,33 +8,97 @@ from dbus.service import FallbackObject as DBusFBObject
 DBUS_PATH_SERVER='/org/shr/Geekogotchi/Server'
 DBUS_IF_SERVER='org.shr.Geekogotchi.Server'
 DBUS_PATH_PETS='/org/shr/Geekogotchi/Pets'
+DBUS_PATH_PET='/org/shr/Geekogotchi/Pet'
 DBUS_IF_PET='org.shr.Geekogotchi.Pet'
 DBUS_IF_PETS='org.shr.Geekogotchi.Pets'
 
-VERSION = '0.0.0'
+VERSION = '0.0.0.0.1'
 
 class Server(DBusFBObject):
-  pets = None
+
+  def __init__(self):
+    DBusFBObject.__init__( self, conn=bus, object_path=DBUS_PATH_SERVER )
+    self.pets = Pets()
+
+  def start(self):
+    self.update()
+    gobject.timeout_add_seconds(5, self.update)
+
+  def update(self):
+    self.pets.update()
+    return True
 
   @dbus.service.method(DBUS_IF_SERVER, "", "s")
   def GetVersion(self):
     return VERSION
 
-  def start(self):
-    self.update()
-    gobject.timeout_add_seconds(30, self.update)
+class Pets(DBusFBObject):
+
+  pets = None
+
+  def __init__(self):
+    DBusFBObject.__init__( self, conn=bus, object_path=DBUS_PATH_PETS )
+    self.pets = {}
+    self.petcount = -1
 
   def update(self):
-    print 'update'
-    return True
+    for pet in self.pets:
+      self.pets[pet].update()
 
-  def __init__(self):
-    DBusFBObject.__init__( self, conn=bus, object_path=DBUS_PATH_SERVER)
-    pets = {}
+  @dbus.service.method(DBUS_IF_PETS, "", "i")
+  def AddPet(self):
+    self.petcount += 1
+    self.pets[self.petcount] = Pet(self.petcount)
+    self.pets[self.petcount].update()
+    return self.petcount
+
+  @dbus.service.method(DBUS_IF_PETS, "i", "")
+  def KillPet(self, id):
+    self.pets[id].kill()
+    del self.pets[id]
+
+  @dbus.service.method(DBUS_IF_PETS, "", "ai")
+  def GetPets(self):
+    pets = []
+    for pet in self.pets:
+      pets.append(pet)
+    return pets
 
 class Pet(DBusFBObject):
-  def __init__(self):
-    DBusFBObject.__init__( self, conn=bus, object_path=DBUS_PATH_PET)
+
+  id = None
+  pets = None
+  props = None
+
+  def __init__(self, id):
+    self.id = id
+    DBusFBObject.__init__( self, conn=bus, object_path=DBUS_PATH_PET+'/'+str(self.id) )
+    self.props = {'Name': 'Tux', 'Live': True, 'Age':0, 'Deat': False, 'Borned':False}
+
+  def update(self):
+    print "update " + str(self.id)
+    self.props['Age'] += 1
+    self.StateUpdated(self.props)
+
+  def kill(self, reason = 'killed'):
+    self.PetDeath(reason)
+
+  @dbus.service.signal(DBUS_IF_PET, "a{sv}")
+  def StateUpdated(self, props):
+    pass
+
+  @dbus.service.signal(DBUS_IF_PET, "")
+  def PetDeath(self, cause):
+    del self.props['Happiness']
+    del self.props['Hungriness']
+    del self.props['Health']
+    self.props['Live'] = False
+    self.props['Dead'] = True
+    self.StateUpdated(self.props)
+
+  @dbus.service.method(DBUS_IF_PET, "", "s")
+  def GetName(self):
+    return self.name
 
 DBusGMainLoop(set_as_default=True)
 mainloop = gobject.MainLoop()

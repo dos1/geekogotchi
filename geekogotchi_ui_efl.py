@@ -19,10 +19,10 @@ class GeekogotchiUI_EFL:
     return ecore.timer_add(interval, func)
   def connect(self):
     self.parent.connect(mainloop = e_dbus.DBusEcoreMainLoop())
-    print self.parent.proxy.GetVersion()
+    print self.parent.server.GetVersion()
+    self.parent.pets.AddPet()
   def start(self):
     '''Start UI, mainloop etc.'''
-    self.connect()
     self.win.show()
     elementary.run()
   def exit(self):
