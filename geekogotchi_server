@@ -4,23 +4,37 @@ import dbus, dbus.service
 import gobject
 from dbus.mainloop.glib import DBusGMainLoop
 from dbus.service import FallbackObject as DBusFBObject
-#from gobject import timeout_add_seconds
 
 DBUS_PATH_SERVER='/org/shr/Geekogotchi/Server'
 DBUS_IF_SERVER='org.shr.Geekogotchi.Server'
+DBUS_PATH_PETS='/org/shr/Geekogotchi/Pets'
+DBUS_IF_PET='org.shr.Geekogotchi.Pet'
+DBUS_IF_PETS='org.shr.Geekogotchi.Pets'
+
 VERSION = '0.0.0'
 
 class Server(DBusFBObject):
+  pets = None
+
   @dbus.service.method(DBUS_IF_SERVER, "", "s")
   def GetVersion(self):
     return VERSION
 
+  def start(self):
+    self.update()
+    gobject.timeout_add_seconds(30, self.update)
+
+  def update(self):
+    print 'update'
+    return True
+
   def __init__(self):
     DBusFBObject.__init__( self, conn=bus, object_path=DBUS_PATH_SERVER)
+    pets = {}
 
-def idle():
-  print 'idle'
-  return False
+class Pet(DBusFBObject):
+  def __init__(self):
+    DBusFBObject.__init__( self, conn=bus, object_path=DBUS_PATH_PET)
 
 DBusGMainLoop(set_as_default=True)
 mainloop = gobject.MainLoop()
@@ -32,9 +46,5 @@ except dbus.DBusException:
     exit(1)
 
 server = Server()
-
-#gobject.idle_add(idle)
-
+server.start()
 mainloop.run()
-
-# TODO...
