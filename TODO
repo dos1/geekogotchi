@@ -1,10 +1,19 @@
-* dead at random age (60-110) instead of hardcoded 100
-* update HHH
-* dead from HHH
+Server:
+* massive update
 * feeding
 * playing
 * healing
-* sleeping
+* attention needed
+* birthday
+* sleep
 * lights
-* 1 day = 1 year
+* 1 day = 1 year, fine-tune values
 * opimd integration
+* cleanin
+Client:
+* selecting UI
+* GenericUI class
+UI:
+* EFL ui
+* CLI ui
+* ncurses ui

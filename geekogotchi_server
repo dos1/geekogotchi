@@ -69,7 +69,7 @@ class Pets(DBusFBObject):
     pickleFile = open(PERSIST_DATA, "w")
     petprops = {}
     for pet in self.pets:
-      petprops[pet] = self.pets[pet].props
+      petprops[pet] = (self.pets[pet].props, self.pets[pet].privprops)
     pickle.dump((self.petcount, petprops),pickleFile)
     pickleFile.close()
 
@@ -103,10 +103,24 @@ class Pet(DBusFBObject):
     self.id = id
     DBusFBObject.__init__( self, conn=bus, object_path=DBUS_PATH_PET+'/'+str(self.id) )
     if not props:
-      self.props = {'Name': 'Tux', 'Alive': True, 'Age':-1, 'Dead': False, 'Borned':False}
+      self.props = {'Alive': True, 'Age':-1, 'Dead': False, 'Borned':False}
+      self.privprops = {'MaxHHH':randint(400, 600),'MaxAge':randint(60, 110), 'HHHStep':randint(1,4), 'DeadLimit':-10}
+      self.privprops['Happiness']=self.privprops['MaxHHH']
+      self.privprops['Hungriness']=0
+      self.privprops['Health']=self.privprops['MaxHHH']
     else:
-      self.props = props
+      self.props = props[0]
+      self.privprops = props[1]
       self.update()
+
+  def calculateHHH(self):
+    #TODO: less than 0. higher than max
+    try:
+      self.props['Happiness']=(100*self.privprops['Happiness'])/self.privprops['MaxHHH']
+      self.props['Hungriness']=(100*self.privprops['Hungriness'])/self.privprops['MaxHHH']
+      self.props['Health']=(100*self.privprops['Health'])/self.privprops['MaxHHH']
+    except KeyError:
+      pass
 
   def update(self):
     print "update " + str(self.id)
@@ -114,17 +128,35 @@ class Pet(DBusFBObject):
       self.born()
     elif self.props['Alive']:
       self.props['Age'] += 1
+      step = self.privprops['HHHStep']
+      if self.props['Borned']:
+        self.privprops['Happiness'] -= step
+        self.privprops['Hungriness'] += step
+        self.privprops['Health'] -= step
+      self.calculateHHH()
       self.StateUpdated(self.props)
-      if self.props['Age']>=100:
+      if self.props['Age']>=self.privprops['MaxAge']:
         self.kill('age')
         return False
+      if self.privprops['Happiness']<self.privprops['DeadLimit']:
+        self.kill('boredom')
+        return False
+      if self.privprops['Health']<self.privprops['DeadLimit']:
+        self.kill('illness')
+        return False
+      if self.privprops['Hungriness']>self.privprops['MaxHHH']-self.privprops['DeadLimit']:
+        self.kill('hungry')
+        return False
+
     return True
 
   def born(self):
     self.props['Borned']=True
-    self.props['Happiness']=randint(20, 40)
-    self.props['Hungriness']=randint(0, 10)
-    self.props['Health']=randint(90, 100)
+    self.privprops['Happiness']=(randint(20, 40)*self.privprops['MaxHHH'])/100
+    self.privprops['Hungriness']=(randint(0, 10)*self.privprops['MaxHHH'])/100
+    self.privprops['Health']=(randint(90, 100)*self.privprops['MaxHHH'])/100
+    print "BORN"
+    self.calculateHHH()
     self.PetBorned()
     self.StateUpdated(self.props)
 
@@ -150,9 +182,17 @@ class Pet(DBusFBObject):
   def PetDeath(self, cause):
     pass
 
+  @dbus.service.method(DBUS_IF_PET, "", "av")
+  def GetState(self):
+    return self.props
+
   @dbus.service.method(DBUS_IF_PET, "", "s")
   def GetName(self):
-    return self.name
+    return self.props.get('Name')
+
+  @dbus.service.method(DBUS_IF_PET, "s", "")
+  def SetName(self, name):
+    self.props['Name'] = name
 
 DBusGMainLoop(set_as_default=True)
 mainloop = gobject.MainLoop()
