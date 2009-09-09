@@ -4,7 +4,9 @@ import gobject
 from dbus.mainloop.glib import DBusGMainLoop
 from dbus.service import FallbackObject as DBusFBObject
 from random import randint
+from math import ceil
 import os, pickle
+import time
 import signal
 
 DBUS_PATH_SERVER='/org/shr/Geekogotchi/Server'
@@ -57,7 +59,6 @@ class Pets(DBusFBObject):
   def start(self):
     for pet in self.pets:
       if not self.pets[pet].props['Dead']:
-        print self.pets[pet].props['Dead']
         gobject.timeout_add_seconds(UPDATE_INTERVAL, self.pets[pet].update)
 
   def update(self):
@@ -104,7 +105,14 @@ class Pet(DBusFBObject):
     DBusFBObject.__init__( self, conn=bus, object_path=DBUS_PATH_PET+'/'+str(self.id) )
     if not props:
       self.props = {'Alive': True, 'Age':-1, 'Dead': False, 'Borned':False}
-      self.privprops = {'MaxHHH':randint(400, 600),'MaxAge':randint(60, 110), 'HHHStep':randint(3,4), 'DeadLimit':randint(-15, -5)}
+      self.privprops = {}
+      self.privprops['MaxHHH']=randint(400, 600)
+      self.privprops['MaxAge']=randint(60, 110)
+      self.privprops['HHHStep']=randint(3,4)
+      self.privprops['DeadLimit']=randint(-15, -5)
+
+      self.privprops['LastUpdate']=time.time()
+
       self.privprops['Happiness']=self.privprops['MaxHHH']
       self.privprops['Hungriness']=0
       self.privprops['Health']=self.privprops['MaxHHH']
@@ -124,6 +132,17 @@ class Pet(DBusFBObject):
 
   def update(self):
     print "update " + str(self.id)
+    diff = time.time()-self.privprops['LastUpdate']
+    if self.props['Alive']:
+      if diff>(UPDATE_INTERVAL):
+        num = int(ceil(diff))
+        for i in range(1, num-1):
+          self.calculate()
+      return self.calculate()
+
+  def calculate(self):
+    print "calculate " + str(self.id)
+    self.privprops['LastUpdate']=time.time()
     if not self.props['Borned'] and self.props['Age']==0:
       self.born()
     elif self.props['Alive']:
@@ -155,7 +174,6 @@ class Pet(DBusFBObject):
     self.privprops['Happiness']=(randint(20, 40)*self.privprops['MaxHHH'])/100
     self.privprops['Hungriness']=(randint(0, 10)*self.privprops['MaxHHH'])/100
     self.privprops['Health']=(randint(90, 100)*self.privprops['MaxHHH'])/100
-    print "BORN"
     self.calculateHHH()
     self.PetBorned()
     self.StateUpdated(self.props)

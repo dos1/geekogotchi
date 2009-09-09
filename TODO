@@ -1,5 +1,4 @@
 Server:
-* massive update
 * feeding
 * playing
 * healing
@@ -9,7 +8,7 @@ Server:
 * lights
 * 1 day = 1 year, fine-tune values
 * opimd integration
-* cleanin
+* cleaning
 Client:
 * selecting UI
 * GenericUI class
