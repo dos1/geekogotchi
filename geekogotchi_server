@@ -104,7 +104,7 @@ class Pet(DBusFBObject):
     DBusFBObject.__init__( self, conn=bus, object_path=DBUS_PATH_PET+'/'+str(self.id) )
     if not props:
       self.props = {'Alive': True, 'Age':-1, 'Dead': False, 'Borned':False}
-      self.privprops = {'MaxHHH':randint(400, 600),'MaxAge':randint(60, 110), 'HHHStep':randint(1,4), 'DeadLimit':-10}
+      self.privprops = {'MaxHHH':randint(400, 600),'MaxAge':randint(60, 110), 'HHHStep':randint(3,4), 'DeadLimit':randint(-15, -5)}
       self.privprops['Happiness']=self.privprops['MaxHHH']
       self.privprops['Hungriness']=0
       self.privprops['Health']=self.privprops['MaxHHH']
