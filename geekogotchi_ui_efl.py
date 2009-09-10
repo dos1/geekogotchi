@@ -37,6 +37,24 @@ class GeekogotchiUI_EFL:
     box.pack_end(self.happy)
     self.happy.show()
 
+    self.feed = elementary.Button(self.win)
+    self.feed.label_set('Feed')
+    self.feed.clicked = self.feedPet
+    box.pack_end(self.feed)
+    self.feed.show()
+
+    self.heal = elementary.Button(self.win)
+    self.heal.label_set('Heal')
+    self.heal.clicked = self.healPet
+    box.pack_end(self.heal)
+    self.heal.show()
+
+    self.play = elementary.Button(self.win)
+    self.play.label_set('Play')
+    self.play.clicked = self.playWithPet
+    box.pack_end(self.play)
+    self.play.show()
+
   def windowClose(self, *args, **kargs):
     self.parent.stop()
   def timer(self, interval, func):
@@ -44,7 +62,8 @@ class GeekogotchiUI_EFL:
   def connect(self):
     self.parent.connect(mainloop = e_dbus.DBusEcoreMainLoop())
     print self.parent.serverVersion()
-    self.parent.addPet()
+    self.pet = self.parent.addPet()
+    self.pet = self.parent.pet(self.pet)
   def update(self, props):
     self.age.label_set('Age: '+str(props['Age'])+' years')
     if props['Alive'] and not props['Borned']:
@@ -56,6 +75,12 @@ class GeekogotchiUI_EFL:
       self.happy.label_set('Happiness: '+str(props['Happiness'])+'%')
       self.health.label_set('Health: '+str(props['Health'])+'%')
       self.hungry.label_set('Hungriness: '+str(props['Hungriness'])+'%')
+  def feedPet(self, *args, **kargs):
+    self.pet.Feed(0)
+  def playWithPet(self, *args, **kargs):
+    self.pet.GoodPlay(0)
+  def healPet(self, *args, **kargs):
+    self.pet.Heal()
   def start(self):
     '''Start UI, mainloop etc.'''
     self.win.show()
