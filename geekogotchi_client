@@ -19,6 +19,8 @@ class GeekogotchiClient:
         self.mainloop = False
     self.server = dbus.Interface(self.bus.get_object('org.shr.Geekogotchi','/org/shr/Geekogotchi/Server'), dbus_interface='org.shr.Geekogotchi.Server')
     self.pets = dbus.Interface(self.bus.get_object('org.shr.Geekogotchi','/org/shr/Geekogotchi/Pets'), dbus_interface='org.shr.Geekogotchi.Pets')
+    self.bus.add_signal_receiver(self.ui.update, dbus_interface="org.shr.Geekogotchi.Pet", signal_name="StateUpdated")
+
   def disconnect(self):
     '''Disonnect from Geekogotchi server'''
     return None
@@ -28,10 +30,13 @@ class GeekogotchiClient:
   def stop(self):
     '''Exit from UI mainloop'''
     self.ui.exit()
-  def getCharacter(self):
-    '''Return character info'''
-    # TODO
-    return {'Name':'Alik', 'Born':1234567, 'Age': 2, 'Health':100, 'Hungry':0}
+  def serverVersion(self):
+    return self.server.GetVersion()
+  def addPet(self):
+    return self.pets.AddPet()
+  def pet(self, id):
+    '''Return character proxy'''
+    return dbus.Interface(self.bus.get_object('org.shr.Geekogotchi','/org/shr/Geekogotchi/Pet/'+str(id)), dbus_interface='org.shr.Geekogotchi.Pet')
   def destroy(self):
     '''Shutting down client'''
     self.ui.destroy()
