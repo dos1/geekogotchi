@@ -212,28 +212,28 @@ class Pet(DBusFBObject):
   @dbus.service.method(DBUS_IF_PET, "i", "")
   def Feed(self, type):
     self.check_alive()
-    self.privprops['Hungriness'] -= 100
+    self.privprops['Hungriness'] -= randint(90, 110)
     self.update()
 
   @dbus.service.method(DBUS_IF_PET, "", "")
   def Heal(self):
     self.check_alive()
-    self.privprops['Health'] += 200
-    self.privprops['Happiness'] -= 150
+    self.privprops['Health'] += randint(150, 220)
+    self.privprops['Happiness'] -= randint(150, 170)
     self.update()
 
   @dbus.service.method(DBUS_IF_PET, "i", "")
   def GoodPlay(self, type):
     self.check_alive()
-    self.privprops['Happiness'] += 100
-    self.privprops['Hungriness'] += 25
+    self.privprops['Happiness'] += randint(90, 120)
+    self.privprops['Hungriness'] += randint(20, 30)
     self.update()
 
   @dbus.service.method(DBUS_IF_PET, "i", "")
   def BadPlay(self, type):
     self.check_alive()
-    self.privprops['Happiness'] -= 10
-    self.privprops['Hungriness'] += 25
+    self.privprops['Happiness'] -= randint(5, 15)
+    self.privprops['Hungriness'] += randint(22, 30)
     self.update()
 
   @dbus.service.method(DBUS_IF_PET, "", "av")
