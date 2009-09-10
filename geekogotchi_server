@@ -190,6 +190,11 @@ class Pet(DBusFBObject):
     self.StateUpdated(self.props)
     self.PetDeath(reason)
 
+  def check_alive(self):
+    if not self.props['Alive']:
+#      raise(PetDead)
+      pass
+
   @dbus.service.signal(DBUS_IF_PET, "a{sv}")
   def StateUpdated(self, props):
     pass
@@ -201,6 +206,33 @@ class Pet(DBusFBObject):
   @dbus.service.signal(DBUS_IF_PET, "s")
   def PetDeath(self, cause):
     pass
+
+  @dbus.service.method(DBUS_IF_PET, "i", "")
+  def Feed(self, type):
+    self.check_alive()
+    self.privprops['Hungriness'] -= 100
+    self.update()
+
+  @dbus.service.method(DBUS_IF_PET, "", "")
+  def Heal(self):
+    self.check_alive()
+    self.privprops['Health'] += 200
+    self.privprops['Happiness'] -= 150
+    self.update()
+
+  @dbus.service.method(DBUS_IF_PET, "i", "")
+  def GoodPlay(self, type):
+    self.check_alive()
+    self.privprops['Happiness'] += 100
+    self.privprops['Hungriness'] += 25
+    self.update()
+
+  @dbus.service.method(DBUS_IF_PET, "i", "")
+  def BadPlay(self, type):
+    self.check_alive()
+    self.privprops['Happiness'] -= 10
+    self.privprops['Hungriness'] += 25
+    self.update()
 
   @dbus.service.method(DBUS_IF_PET, "", "av")
   def GetState(self):
