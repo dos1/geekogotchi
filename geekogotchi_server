@@ -19,6 +19,7 @@ DBUS_IF_PETS='org.shr.Geekogotchi.Pets'
 PERSIST_DATA='/usr/share/geekogotchi/pets.pickle'
 
 UPDATE_INTERVAL = 1
+DAY_LENGTH=2
 
 VERSION = '0.0.0.0.1'
 
@@ -112,6 +113,7 @@ class Pet(DBusFBObject):
       self.privprops['DeadLimit']=randint(-15, -5)
 
       self.privprops['LastUpdate']=time.time()
+      self.privprops['Created']=time.time()
 
       self.privprops['Happiness']=self.privprops['MaxHHH']
       self.privprops['Hungriness']=0
@@ -148,7 +150,7 @@ class Pet(DBusFBObject):
     if not self.props['Borned'] and self.props['Age']==0:
       self.born()
     elif self.props['Alive']:
-      self.props['Age'] += 1
+      self.props['Age'] = int(ceil(((ceil(time.time())-ceil(self.privprops['Created']))/DAY_LENGTH)-1))
       step = self.privprops['HHHStep']
       if self.props['Borned']:
         self.privprops['Happiness'] -= step
