@@ -13,6 +13,30 @@ class GeekogotchiUI_EFL:
     bg.show()
     self.win.resize_object_add(bg)
     self.win.destroy = self.windowClose
+    box = elementary.Box(self.win)
+    self.win.resize_object_add(box)
+    box.show()
+
+    self.age = elementary.Label(self.win)
+    box.pack_start(self.age)
+    self.age.show()
+
+    self.state = elementary.Label(self.win)
+    box.pack_end(self.state)
+    self.state.show()
+
+    self.health = elementary.Label(self.win)
+    box.pack_end(self.health)
+    self.health.show()
+
+    self.hungry = elementary.Label(self.win)
+    box.pack_end(self.hungry)
+    self.hungry.show()
+
+    self.happy = elementary.Label(self.win)
+    box.pack_end(self.happy)
+    self.happy.show()
+
   def windowClose(self, *args, **kargs):
     self.parent.stop()
   def timer(self, interval, func):
@@ -22,7 +46,16 @@ class GeekogotchiUI_EFL:
     print self.parent.serverVersion()
     self.parent.addPet()
   def update(self, props):
-    print props
+    self.age.label_set('Age: '+str(props['Age'])+' years')
+    if props['Alive'] and not props['Borned']:
+      self.state.label_set('Not borned yet')
+    elif props['Dead']:
+      self.state.label_set('Dead')
+    else:
+      self.state.label_set('')
+      self.happy.label_set('Happiness: '+str(props['Happiness'])+'%')
+      self.health.label_set('Health: '+str(props['Health'])+'%')
+      self.hungry.label_set('Hungriness: '+str(props['Hungriness'])+'%')
   def start(self):
     '''Start UI, mainloop etc.'''
     self.win.show()
