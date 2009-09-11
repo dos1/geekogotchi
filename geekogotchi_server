@@ -209,6 +209,7 @@ class Pet(DBusFBObject):
       del self.props['Health']
     self.props['Alive'] = False
     self.props['Dead'] = True
+    self.props['DeadReason'] = reason
     self.StateUpdated(self.props)
     self.PetDeath(reason)
 
