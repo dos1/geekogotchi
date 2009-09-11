@@ -162,7 +162,10 @@ class Pet(DBusFBObject):
     if not self.props['Borned'] and self.props['Age']==0:
       self.born()
     elif self.props['Alive']:
+      oldage = self.props['Age']
       self.props['Age'] = int(ceil(((ceil(time.time())-ceil(self.privprops['Created']))/DAY_LENGTH)-1))
+      if self.props['Age'] > oldage:
+        self.Birthday(self.props['Age'])
       step = self.privprops['HHHStep']
       if self.props['Borned']:
         self.privprops['Happiness'] -= step
@@ -219,6 +222,10 @@ class Pet(DBusFBObject):
 
   @dbus.service.signal(DBUS_IF_PET, "s")
   def PetDeath(self, cause):
+    pass
+
+  @dbus.service.signal(DBUS_IF_PET, "i")
+  def Birthday(self, age):
     pass
 
   @dbus.service.method(DBUS_IF_PET, "i", "")
