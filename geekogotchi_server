@@ -123,20 +123,24 @@ class Pet(DBusFBObject):
       self.privprops = props[1]
       self.update()
 
-  def calcPerc(self, val, max):
+  def calcPerc(self, val, max, upd = None):
     perc = (100*val)/max
     if perc < 0:
+      if upd=='Hungriness':
+        self.privprops[upd] = 0
       return 0
     elif perc > 100:
+      if upd and upd!='Hungriness':
+        self.privprops[upd] = self.privprops['MaxHHH']
       return 100
     else:
       return perc
 
   def calculateHHH(self):
     try:
-      self.props['Happiness']=self.calcPerc(self.privprops['Happiness'],self.privprops['MaxHHH'])
-      self.props['Hungriness']=self.calcPerc(self.privprops['Hungriness'],self.privprops['MaxHHH'])
-      self.props['Health']=self.calcPerc(self.privprops['Health'],self.privprops['MaxHHH'])
+      self.props['Happiness']=self.calcPerc(self.privprops['Happiness'],self.privprops['MaxHHH'], 'Happiness')
+      self.props['Hungriness']=self.calcPerc(self.privprops['Hungriness'],self.privprops['MaxHHH'], 'Hungriness')
+      self.props['Health']=self.calcPerc(self.privprops['Health'],self.privprops['MaxHHH'], 'Health')
     except KeyError:
       pass
 
