@@ -73,7 +73,7 @@ class GeekogotchiUI_EFL:
       self.feed.hide()
       self.heal.hide()
     elif props['Dead']:
-      self.state.label_set('Dead')
+      self.state.label_set('Dead ('+props['DeadReason']+')')
       self.age.show()
       self.happy.label_set('')
       self.health.label_set('')

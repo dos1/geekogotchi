@@ -1,8 +1,9 @@
 Server:
 * attention needed
+* cleaning list of pets
 * sleep
 * lights
-* 1 day = 1 year, fine-tune values
+* fine-tune time values
 * opimd integration
 * cleaning
 Client:
