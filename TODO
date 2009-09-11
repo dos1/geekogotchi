@@ -8,8 +8,11 @@ Server:
 * cleaning
 Client:
 * selecting UI
+* selecting pet
 * GenericUI class
 UI:
 * EFL ui
+  * rewrite
 * CLI ui
+  * write
 * ncurses ui
