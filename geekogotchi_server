@@ -8,6 +8,7 @@ from math import ceil
 import os, pickle
 import time
 import signal
+import sys
 
 DBUS_PATH_SERVER='/org/shr/Geekogotchi/Server'
 DBUS_IF_SERVER='org.shr.Geekogotchi.Server'
@@ -18,8 +19,12 @@ DBUS_IF_PETS='org.shr.Geekogotchi.Pets'
 
 PERSIST_DATA='/usr/share/geekogotchi/pets.pickle'
 
-UPDATE_INTERVAL = 1
-DAY_LENGTH=2
+if '--debug' in sys.argv or '-d' in sys.argv:
+  UPDATE_INTERVAL = 1
+  DAY_LENGTH = 2
+else:
+  UPDATE_INTERVAL = 60
+  DAY_LENGTH = 60*60*24
 
 VERSION = '0.0.0.1'
 
@@ -149,7 +154,7 @@ class Pet(DBusFBObject):
     diff = time.time()-self.privprops['LastUpdate']
     if self.props['Alive']:
       if diff>(UPDATE_INTERVAL):
-        num = int(ceil(diff))
+        num = int(ceil(diff))/UPDATE_INTERVAL
         for i in range(1, num-1):
           self.calculate()
           if not self.props['Alive']:
