@@ -68,13 +68,28 @@ class GeekogotchiUI_EFL:
     self.age.label_set('Age: '+str(props['Age'])+' years')
     if props['Alive'] and not props['Borned']:
       self.state.label_set('Not borned yet')
+      self.age.hide()
+      self.play.hide()
+      self.feed.hide()
+      self.heal.hide()
     elif props['Dead']:
       self.state.label_set('Dead')
+      self.age.show()
+      self.happy.label_set('')
+      self.health.label_set('')
+      self.hungry.label_set('')
+      self.play.hide()
+      self.feed.hide()
+      self.heal.hide()
     else:
       self.state.label_set('')
       self.happy.label_set('Happiness: '+str(props['Happiness'])+'%')
       self.health.label_set('Health: '+str(props['Health'])+'%')
       self.hungry.label_set('Hungriness: '+str(props['Hungriness'])+'%')
+      self.age.show()
+      self.play.show()
+      self.feed.show()
+      self.heal.show()
   def feedPet(self, *args, **kargs):
     self.pet.Feed(0)
   def playWithPet(self, *args, **kargs):
