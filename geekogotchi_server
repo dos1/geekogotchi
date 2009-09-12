@@ -237,12 +237,13 @@ class Pet(DBusFBObject):
   def Birthday(self, age):
     pass
 
-  @dbus.service.method(DBUS_IF_PET, "i", "")
+  @dbus.service.method(DBUS_IF_PET, "i", "b")
   def Feed(self, type):
     self.check_alive()
     self.privprops['Hungriness'] -= randint(90, 110)
     self.calculateHHH()
     self.StateUpdated(self.props)
+    return True # TODO
 
   @dbus.service.method(DBUS_IF_PET, "", "")
   def Heal(self):
@@ -251,6 +252,10 @@ class Pet(DBusFBObject):
     self.privprops['Happiness'] -= randint(150, 170)
     self.calculateHHH()
     self.StateUpdated(self.props)
+
+  @dbus.service.method(DBUS_IF_PET, "i", "b")
+  def Play(self, type):
+    return True # TODO
 
   @dbus.service.method(DBUS_IF_PET, "i", "")
   def GoodPlay(self, type):
