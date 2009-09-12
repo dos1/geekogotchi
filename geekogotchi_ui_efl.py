@@ -25,34 +25,44 @@ class GeekogotchiUI_EFL:
     box.pack_end(self.state)
     self.state.show()
 
+    self.values = elementary.Box(self.win)
+    self.values.show()
+    box.pack_end(self.values)
+
     self.health = elementary.Label(self.win)
-    box.pack_end(self.health)
+    self.values.pack_end(self.health)
     self.health.show()
 
     self.hungry = elementary.Label(self.win)
-    box.pack_end(self.hungry)
+    self.values.pack_end(self.hungry)
     self.hungry.show()
 
     self.happy = elementary.Label(self.win)
-    box.pack_end(self.happy)
+    self.values.pack_end(self.happy)
     self.happy.show()
+
+    self.buttons = elementary.Box(self.win)
+    self.buttons.horizontal_set(True)
+    self.buttons.homogenous_set(True)
+    box.pack_end(self.buttons)
+    self.buttons.show()
 
     self.feed = elementary.Button(self.win)
     self.feed.label_set('Feed')
     self.feed.clicked = self.feedPet
-    box.pack_end(self.feed)
+    self.buttons.pack_end(self.feed)
     self.feed.show()
 
     self.heal = elementary.Button(self.win)
     self.heal.label_set('Heal')
     self.heal.clicked = self.healPet
-    box.pack_end(self.heal)
+    self.buttons.pack_end(self.heal)
     self.heal.show()
 
     self.play = elementary.Button(self.win)
     self.play.label_set('Play')
     self.play.clicked = self.playWithPet
-    box.pack_end(self.play)
+    self.buttons.pack_end(self.play)
     self.play.show()
 
   def windowClose(self, *args, **kargs):
@@ -69,27 +79,21 @@ class GeekogotchiUI_EFL:
     if props['Alive'] and not props['Borned']:
       self.state.label_set('Not borned yet')
       self.age.hide()
-      self.play.hide()
-      self.feed.hide()
-      self.heal.hide()
+      self.buttons.hide()
     elif props['Dead']:
       self.state.label_set('Dead ('+props['DeadReason']+')')
       self.age.show()
       self.happy.label_set('')
       self.health.label_set('')
       self.hungry.label_set('')
-      self.play.hide()
-      self.feed.hide()
-      self.heal.hide()
+      self.buttons.hide()
     else:
       self.state.label_set('')
       self.happy.label_set('Happiness: '+str(props['Happiness'])+'%')
       self.health.label_set('Health: '+str(props['Health'])+'%')
       self.hungry.label_set('Hungriness: '+str(props['Hungriness'])+'%')
       self.age.show()
-      self.play.show()
-      self.feed.show()
-      self.heal.show()
+      self.buttons.show()
   def feedPet(self, *args, **kargs):
     self.pet.Feed(0)
   def playWithPet(self, *args, **kargs):
