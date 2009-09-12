@@ -167,13 +167,13 @@ class Pet(DBusFBObject):
   def calculate(self):
     print "calculate " + str(self.id)
     self.privprops['LastUpdate']=time.time()
-    if not self.props['Borned'] and self.props['Age']==0:
-      self.born()
-    elif self.props['Alive']:
+    if self.props['Alive']:
       oldage = self.props['Age']
       self.props['Age'] = int(ceil(((ceil(time.time())-ceil(self.privprops['Created']))/DAY_LENGTH)-1))
       if self.props['Age'] > oldage and self.props['Borned']:
         self.Birthday(self.props['Age'])
+      if not self.props['Borned'] and self.props['Age']==0:
+        self.born()
       step = self.privprops['HHHStep']
       if self.props['Borned']:
         self.privprops['Happiness'] -= 3*step
