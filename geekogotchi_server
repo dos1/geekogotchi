@@ -19,6 +19,12 @@ DBUS_IF_PETS='org.shr.Geekogotchi.Pets'
 
 PERSIST_DATA='/usr/share/geekogotchi/pets.pickle'
 
+SENDERS = ['Amy', 'Mary', 'Allison', 'Joanne']
+NAMES = [
+    ['Tuxi'],
+    ['Tux']
+        ]
+
 if '--debug' in sys.argv or '-d' in sys.argv:
   UPDATE_INTERVAL = 1
   DAY_LENGTH = 2
@@ -131,6 +137,11 @@ class Pet(DBusFBObject):
       self.privprops = props[1]
       self.update()
 
+  def send_message(self, who, text):
+    print who+': '+text
+    self.messagesproxy = dbus.Interface(bus.get_object('org.freesmartphone.opimd', '/org/freesmartphone/PIM/Messages'), dbus_interface='org.freesmartphone.PIM.Messages')
+    self.messagesproxy.AddIncoming({'Direction':'in', 'Source':'Geekogotchi', 'Sender': who, 'Content':text})
+
   def calcPerc(self, val, max, upd = None):
     perc = (100*val)/max
     if perc < 0:
@@ -206,6 +217,11 @@ class Pet(DBusFBObject):
 
   def born(self):
     self.props['Borned']=True
+    sex = randint(0,1)
+    if sex:
+      self.props['Gender']='male'
+    else:
+      self.props['Gender']='female'
     self.privprops['Happiness']=(randint(20, 40)*self.privprops['MaxHHH'])/100
     self.privprops['Hungriness']=(randint(0, 10)*self.privprops['MaxHHH'])/100
     self.privprops['Health']=(randint(90, 100)*self.privprops['MaxHHH'])/100
@@ -235,7 +251,11 @@ class Pet(DBusFBObject):
 
   @dbus.service.signal(DBUS_IF_PET, "")
   def PetBorned(self):
-    pass
+    if self.props['Gender']=='male':
+      msg = "Ooohh, that's your new pet? He is soooo cute! How will you name him? Maybe %s? That's wonderful name :)" % NAMES[1][randint(0, len(NAMES[1])-1)]
+    else:
+      msg = "Ooohh, that's your new pet? She is soooo cute! How will you name her? Maybe %s? That's wonderful name :)" % NAMES[0][randint(0, len(NAMES[0])-1)]
+    self.send_message(SENDERS[randint(0,len(SENDERS)-1)], msg)
 
   @dbus.service.signal(DBUS_IF_PET, "s")
   def PetDeath(self, cause):
