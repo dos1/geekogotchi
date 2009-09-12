@@ -100,7 +100,8 @@ class GeekogotchiUI_EFL:
   def feedPet(self, *args, **kargs):
     self.pet.Feed(0)
   def playWithPet(self, *args, **kargs):
-    self.pet.GoodPlay(0)
+    if self.pet.Play(0):
+      self.pet.GoodPlay(0)
   def healPet(self, *args, **kargs):
     self.pet.Heal()
   def start(self):
