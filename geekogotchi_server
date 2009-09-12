@@ -91,6 +91,9 @@ class Pets(DBusFBObject):
   @dbus.service.method(DBUS_IF_PETS, "i", "")
   def KillPet(self, id):
     self.pets[id].kill()
+
+  @dbus.service.method(DBUS_IF_PETS, "i", "")
+  def Delete(self, id):
     del self.pets[id]
 
   @dbus.service.method(DBUS_IF_PETS, "", "ai")
