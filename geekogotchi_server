@@ -255,6 +255,7 @@ class Pet(DBusFBObject):
 
   @dbus.service.method(DBUS_IF_PET, "i", "b")
   def Play(self, type):
+    self.check_alive()
     return True # TODO
 
   @dbus.service.method(DBUS_IF_PET, "i", "")
