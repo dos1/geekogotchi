@@ -115,7 +115,7 @@ class Pet(DBusFBObject):
     if not props:
       self.props = {'Alive': True, 'Age':-1, 'Dead': False, 'Borned':False}
       self.privprops = {}
-      self.privprops['MaxHHH']=randint(400, 600)
+      self.privprops['MaxHHH']=randint(900, 1200)
       self.privprops['MaxAge']=randint(60, 110)
       self.privprops['HHHStep']=randint(1,2)
       self.privprops['DeadLimit']=randint(-15, -5)
