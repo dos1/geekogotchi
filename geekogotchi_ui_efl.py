@@ -13,8 +13,11 @@ class GeekogotchiUI_EFL:
     bg.show()
     self.win.resize_object_add(bg)
     self.win.destroy = self.windowClose
+    frame = elementary.Frame(self.win)
     box = elementary.Box(self.win)
-    self.win.resize_object_add(box)
+    frame.content_set(box)
+    frame.show()
+    self.win.resize_object_add(frame)
     box.show()
 
     self.age = elementary.Label(self.win)
