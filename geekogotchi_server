@@ -26,7 +26,7 @@ else:
   UPDATE_INTERVAL = 60
   DAY_LENGTH = 60*60*24
 
-VERSION = '0.0.0.1'
+VERSION = '0.0.0.2'
 
 class Server(DBusFBObject):
 
@@ -169,7 +169,7 @@ class Pet(DBusFBObject):
     elif self.props['Alive']:
       oldage = self.props['Age']
       self.props['Age'] = int(ceil(((ceil(time.time())-ceil(self.privprops['Created']))/DAY_LENGTH)-1))
-      if self.props['Age'] > oldage:
+      if self.props['Age'] > oldage and self.props['Borned']:
         self.Birthday(self.props['Age'])
       step = self.privprops['HHHStep']
       if self.props['Borned']:
