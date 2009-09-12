@@ -180,21 +180,29 @@ class Pet(DBusFBObject):
         self.privprops['Hungriness'] += 2*step
         self.privprops['Health'] -= step
       self.calculateHHH()
+      if self.check_for_death():
+        self.StateUpdated(self.props)
+        return False
       self.StateUpdated(self.props)
-      if self.props['Age']>=self.privprops['MaxAge']:
-        self.kill('age')
-        return False
-      if self.privprops['Happiness']<self.privprops['DeadLimit']:
-        self.kill('boredom')
-        return False
-      if self.privprops['Health']<self.privprops['DeadLimit']:
-        self.kill('illness')
-        return False
-      if self.privprops['Hungriness']>self.privprops['MaxHHH']-self.privprops['DeadLimit']:
-        self.kill('hungry')
-        return False
 
     return True
+
+  def check_for_death(self):
+    if self.props['Dead']:
+      return False
+    if self.props['Age']>=self.privprops['MaxAge']:
+      self.kill('age')
+      return True
+    if self.privprops['Happiness']<self.privprops['DeadLimit']:
+      self.kill('boredom')
+      return True
+    if self.privprops['Health']<self.privprops['DeadLimit']:
+      self.kill('illness')
+      return True
+    if self.privprops['Hungriness']>self.privprops['MaxHHH']-self.privprops['DeadLimit']:
+      self.kill('hungry')
+      return True
+    return False
 
   def born(self):
     self.props['Borned']=True
@@ -223,7 +231,7 @@ class Pet(DBusFBObject):
 
   @dbus.service.signal(DBUS_IF_PET, "a{sv}")
   def StateUpdated(self, props):
-    pass
+    self.check_for_death()
 
   @dbus.service.signal(DBUS_IF_PET, "")
   def PetBorned(self):
