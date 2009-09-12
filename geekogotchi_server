@@ -114,7 +114,7 @@ class Pet(DBusFBObject):
       self.privprops = {}
       self.privprops['MaxHHH']=randint(400, 600)
       self.privprops['MaxAge']=randint(60, 110)
-      self.privprops['HHHStep']=randint(3,4)
+      self.privprops['HHHStep']=randint(1,2)
       self.privprops['DeadLimit']=randint(-15, -5)
 
       self.privprops['LastUpdate']=time.time()
@@ -173,8 +173,8 @@ class Pet(DBusFBObject):
         self.Birthday(self.props['Age'])
       step = self.privprops['HHHStep']
       if self.props['Borned']:
-        self.privprops['Happiness'] -= step
-        self.privprops['Hungriness'] += step
+        self.privprops['Happiness'] -= 3*step
+        self.privprops['Hungriness'] += 2*step
         self.privprops['Health'] -= step
       self.calculateHHH()
       self.StateUpdated(self.props)
@@ -238,28 +238,32 @@ class Pet(DBusFBObject):
   def Feed(self, type):
     self.check_alive()
     self.privprops['Hungriness'] -= randint(90, 110)
-    self.update()
+    self.calculateHHH()
+    self.StateUpdated(self.props)
 
   @dbus.service.method(DBUS_IF_PET, "", "")
   def Heal(self):
     self.check_alive()
     self.privprops['Health'] += randint(150, 220)
     self.privprops['Happiness'] -= randint(150, 170)
-    self.update()
+    self.calculateHHH()
+    self.StateUpdated(self.props)
 
   @dbus.service.method(DBUS_IF_PET, "i", "")
   def GoodPlay(self, type):
     self.check_alive()
     self.privprops['Happiness'] += randint(90, 120)
     self.privprops['Hungriness'] += randint(20, 30)
-    self.update()
+    self.calculateHHH()
+    self.StateUpdated(self.props)
 
   @dbus.service.method(DBUS_IF_PET, "i", "")
   def BadPlay(self, type):
     self.check_alive()
     self.privprops['Happiness'] -= randint(5, 15)
     self.privprops['Hungriness'] += randint(22, 30)
-    self.update()
+    self.calculateHHH()
+    self.StateUpdated(self.props)
 
   @dbus.service.method(DBUS_IF_PET, "", "av")
   def GetState(self):
