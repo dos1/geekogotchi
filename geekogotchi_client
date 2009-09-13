@@ -41,6 +41,8 @@ class GeekogotchiClient:
     return self.pets.DeletePet(id)
   def getPets(self):
     return self.pets.GetPets()
+  def cleanPets(self):
+    return self.pets.CleanPets()
   def pet(self, id):
     '''Return character proxy'''
     return dbus.Interface(self.bus.get_object('org.shr.Geekogotchi','/org/shr/Geekogotchi/Pet/'+str(id)), dbus_interface='org.shr.Geekogotchi.Pet')
