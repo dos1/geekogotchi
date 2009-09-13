@@ -72,10 +72,17 @@ class Pets(DBusFBObject):
     for pet in self.pets:
       if not self.pets[pet].props['Dead']:
         gobject.timeout_add_seconds(UPDATE_INTERVAL, self.pets[pet].update)
+    bus.add_signal_receiver(self.resume, dbus_interface="org.freesmartphone.Usage", signal_name="SystemAction")
+
+  def resume(self, res):
+    if res=='RESUME':
+      print "Resume!"
+      self.update()
 
   def update(self):
     for pet in self.pets:
-      self.pets[pet].update()
+      if not self.pets[pet].props['Dead']:
+        self.pets[pet].update()
 
   def store(self):
     print "storing"
