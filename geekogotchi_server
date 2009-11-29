@@ -32,7 +32,7 @@ else:
   UPDATE_INTERVAL = 60
   DAY_LENGTH = 60*60*24
 
-VERSION = '0.0.0.3'
+VERSION = '0.0.0.4'
 
 class Server(DBusFBObject):
 
@@ -318,7 +318,7 @@ class Pet(DBusFBObject):
     self.calculateHHH()
     self.StateUpdated(self.props)
 
-  @dbus.service.method(DBUS_IF_PET, "", "av")
+  @dbus.service.method(DBUS_IF_PET, "", "a{sv}")
   def GetState(self):
     return self.props
 
