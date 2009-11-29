@@ -20,7 +20,7 @@ class GeekogotchiClient:
     self.server = dbus.Interface(self.bus.get_object('org.shr.Geekogotchi','/org/shr/Geekogotchi/Server'), dbus_interface='org.shr.Geekogotchi.Server')
     self.pets = dbus.Interface(self.bus.get_object('org.shr.Geekogotchi','/org/shr/Geekogotchi/Pets'), dbus_interface='org.shr.Geekogotchi.Pets')
     if self.mainloop:
-      self.bus.add_signal_receiver(self.ui.update, dbus_interface="org.shr.Geekogotchi.Pet", signal_name="StateUpdated")
+      self.bus.add_signal_receiver(self.ui.update, dbus_interface="org.shr.Geekogotchi.Pet", signal_name="StateUpdated", path_keyword="path")
 
   def disconnect(self):
     '''Disonnect from Geekogotchi server'''
