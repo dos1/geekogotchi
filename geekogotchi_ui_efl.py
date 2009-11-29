@@ -14,7 +14,7 @@ class GeekogotchiUI_EFL:
     bg = elementary.Background(self.win)
     bg.show()
     self.win.resize_object_add(bg)
-    self.win.destroy = self.windowClose
+    self.win._callback_add('destroy', self.windowClose)
     frame = elementary.Frame(self.win)
     box = elementary.Box(self.win)
     frame.content_set(box)
@@ -54,25 +54,25 @@ class GeekogotchiUI_EFL:
 
     self.feed = elementary.Button(self.win)
     self.feed.label_set('Feed')
-    self.feed.clicked = self.feedPet
+    self.feed._callback_add('clicked', self.feedPet)
     self.buttons.pack_end(self.feed)
     self.feed.show()
 
     self.heal = elementary.Button(self.win)
     self.heal.label_set('Heal')
-    self.heal.clicked = self.healPet
+    self.heal._callback_add('clicked', self.healPet)
     self.buttons.pack_end(self.heal)
     self.heal.show()
 
     self.play = elementary.Button(self.win)
     self.play.label_set('Play')
-    self.play.clicked = self.playWithPet
+    self.play._callback_add('clicked', self.playWithPet)
     self.buttons.pack_end(self.play)
     self.play.show()
 
     self.remove = elementary.Button(self.win)
     self.remove.label_set('Remove')
-    self.remove.clicked = self.removePet
+    self.remove._callback_add('clicked', self.removePet)
     box.pack_end(self.remove)
 
   def windowClose(self, *args, **kargs):
