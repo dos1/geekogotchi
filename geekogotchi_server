@@ -42,6 +42,7 @@ class Server(DBusFBObject):
 
   def start(self):
     self.pets.start()
+    print 'Server started'
 
   def stop(self):
     self.pets.store()
