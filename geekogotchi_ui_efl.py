@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 
 import elementary, edje, ecore, e_dbus
+from functools import partial
 
 class GeekogotchiUI_EFL:
   parent = None
   def __init__(self, p):
     self.parent = p
+    self.petid = -1
     elementary.init()
     self.win = elementary.Window('geekogotchi', elementary.ELM_WIN_BASIC)
     self.win.title_set('Geekogotchi')
@@ -68,6 +70,11 @@ class GeekogotchiUI_EFL:
     self.buttons.pack_end(self.play)
     self.play.show()
 
+    self.remove = elementary.Button(self.win)
+    self.remove.label_set('Remove')
+    self.remove.clicked = self.removePet
+    box.pack_end(self.remove)
+
   def windowClose(self, *args, **kargs):
     self.parent.stop()
   def timer(self, interval, func):
@@ -75,9 +82,44 @@ class GeekogotchiUI_EFL:
   def connect(self):
     self.parent.connect(mainloop = e_dbus.DBusEcoreMainLoop())
     print self.parent.serverVersion()
-    self.pet = self.parent.addPet()
-    self.pet = self.parent.pet(self.pet)
-  def update(self, props):
+    self.selectPet()
+  def removePet(self, *args, **kargs):
+    self.parent.deletePet(self.petid)
+    self.windowClose()
+  def selectPet(self):
+    dia = elementary.InnerWindow(self.win)
+    new = elementary.Button(dia)
+    new.label_set('New pet')
+    new._callback_add('clicked', partial(self.newPet, dia))
+    new.show()
+    list = elementary.List(dia)
+    list.size_hint_align_set(-1.0,-1.0)
+    list.size_hint_weight_set(1.0, 1.0)
+    petlist = self.parent.getPets()
+    for pet in petlist:
+      list.item_append(str(pet), None, None, partial(self.loadPet, pet, dia))
+    list.go()
+    list.show()
+    box = elementary.Box(dia)
+    box.pack_start(list)
+    box.pack_end(new)
+    box.show()
+    dia.content_set(box)
+    self.win.resize_object_add(dia)
+    dia.show()
+    dia.activate()
+  def loadPet(self, pet, dia, *args, **kargs):
+    self.pet = self.parent.pet(pet)
+    self.petid = pet
+    self.update(self.pet.GetState(), str(pet))
+    dia.delete()
+  def newPet(self, dia, *args, **kargs):
+    self.petid = self.parent.addPet()
+    self.pet = self.parent.pet(self.petid)
+    dia.delete()
+  def update(self, props, path):
+    if path.replace('/org/shr/Geekogotchi/Pet/','') != str(self.petid):
+      return False
     self.age.label_set('Age: '+str(props['Age'])+' years')
     if props['Alive'] and not props['Borned']:
       self.state.label_set('Not borned yet')
@@ -90,6 +132,7 @@ class GeekogotchiUI_EFL:
       self.health.label_set('')
       self.hungry.label_set('')
       self.buttons.hide()
+      self.remove.show()
     else:
       self.state.label_set('')
       self.happy.label_set('Happiness: '+str(props['Happiness'])+'%')
