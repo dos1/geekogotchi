@@ -14,7 +14,7 @@ class GeekogotchiUI_EFL:
     bg = elementary.Background(self.win)
     bg.show()
     self.win.resize_object_add(bg)
-    self.win._callback_add('destroy', self.windowClose)
+    self.win.callback_destroy_add(self.windowClose)
     frame = elementary.Frame(self.win)
     box = elementary.Box(self.win)
     frame.content_set(box)
