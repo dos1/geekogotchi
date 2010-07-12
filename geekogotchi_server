@@ -156,8 +156,11 @@ class Pet(DBusFBObject):
 
   def send_message(self, who, text):
     print who+': '+text
-    self.messagesproxy = dbus.Interface(bus.get_object('org.freesmartphone.opimd', '/org/freesmartphone/PIM/Messages'), dbus_interface='org.freesmartphone.PIM.Messages')
-    self.messagesproxy.AddIncoming({'Direction':'in', 'Source':'Geekogotchi', 'Sender': who, 'Content':text})
+    try:
+      self.messagesproxy = dbus.Interface(bus.get_object('org.freesmartphone.opimd', '/org/freesmartphone/PIM/Messages'), dbus_interface='org.freesmartphone.PIM.Messages')
+      self.messagesproxy.AddIncoming({'Direction':'in', 'Source':'Geekogotchi', 'Sender': who, 'Content':text})
+    except:
+      print "Unable to send message to opimd"
 
   def calcPerc(self, val, max, upd = None):
     perc = (100*val)/max
