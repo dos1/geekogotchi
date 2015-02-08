@@ -289,6 +289,8 @@ class Pet(DBusFBObject):
   def Feed(self, type):
     self.check_alive()
     self.privprops['Hungriness'] -= randint(90, 110)
+    if self.privprops['Hungriness']<0:
+      self.privprops['Happiness'] -= randint(self.privprops['Hungriness']*(-1), self.privprops['Hungriness']*(-2))
     self.calculateHHH()
     self.StateUpdated(self.props)
     return True # TODO
